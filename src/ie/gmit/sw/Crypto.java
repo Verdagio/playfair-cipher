@@ -12,11 +12,7 @@ package ie.gmit.sw;
  * 
  */
 public abstract class Crypto implements Cryptography {
-
-	private String key;
-	private String[][] map;
-
-	public Crypto(String key, String[][] map) {}
 	
-
+	public Crypto() {}
+	
 }
