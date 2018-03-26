@@ -1,4 +1,4 @@
-package ie.gmit.sw;
+package ie.gmit.sw.ai;
 
 /**
  * Cryptography or cryptology is the practice and study of techniques for secure

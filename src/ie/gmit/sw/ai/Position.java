@@ -1,4 +1,4 @@
-package ie.gmit.sw;
+package ie.gmit.sw.ai;
 
 /**
  * The Position object will direct a character to an x & y position within a 2
