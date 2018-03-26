@@ -64,9 +64,9 @@ public class Key {
 		} else if ( x >= 2 && x < 4) {
 			modifiedKey = swapCols(originalKey, r.nextInt(4), r.nextInt(4));
 		} else if ( x >= 4 && x < 6) {
-			
+			modifiedKey = flipRows(originalKey);
 		} else if ( x >= 6 && x < 8) {
-			
+			modifiedKey = flipCols(originalKey);
 		} else if ( x >= 8 && x < 10) {
 			modifiedKey = new StringBuffer(originalKey).reverse().toString();
 		} else {
@@ -90,32 +90,39 @@ public class Key {
 	}// flip rows
 	
 	private String flipCols(String key) {
-		StringBuilder sb = new StringBuilder();
+		int l = key.length() - (key.length()/5);
 		
-		return sb.toString();
+		for (int i = 0; i < 5; i++){
+			for(int j = 0; j < 5; j++) {
+				char tmp = key.charAt(i*5 + j);
+				key.replace(key.charAt(i*5 + j), key.charAt(l + j));
+				key.replace(key.charAt(l + j), tmp);
+			}
+			l-=5;
+		}//for
+		return key;
 	}//flipCols
 	
 	private String swapRows(String key, int r1, int r2) {
 		Random r = new SecureRandom();
-		String a = key.substring((r1 * 25)/5, ((r1 * 25)/5) + 4);
-		String b = key.substring((r2 * 25)/5, ((r2 * 25)/5) + 4);
 		
-		return (r1 == r2) ? swapRows(key, r.nextInt(4), r.nextInt(4)) : key.replace(a, b).replace(b, a);		
+		return (r1 == r2) ? swapRows(key, r.nextInt(4), r.nextInt(4)) :  permutate(key, r1, r2, true);
 	}//swapRows
 	
 	private String swapCols(String key, int c1, int c2) {
 		Random r = new SecureRandom();
 		
-		return (c1 == c2) ? swapCols(key, r.nextInt(4), r.nextInt(4)) : permutate(key, c1, c2);
+		return (c1 == c2) ? swapCols(key, r.nextInt(4), r.nextInt(4)) : permutate(key, c1, c2, false);
 	}//swapcols
 	
-	private String permutate(String key, int a, int b) {
+	private String permutate(String key, int a, int b, boolean isRows) {
 			char[] newKey = key.toCharArray();
 			
 			for(int i = 0; i < key.length() ; i++) {
-				char tmp = newKey[i*5 + a];
-				newKey[i * 5 + a] = newKey[i * 5 + b];
-				newKey[i * 5 + b] = tmp;
+				int index = (isRows) ? i : i*5;
+				char tmp =  newKey[index + a];
+				newKey[index + a] =  newKey[index + a];
+				newKey[index + b] = tmp;
 			}//for
 			return new String(newKey);
 	}//permutate
