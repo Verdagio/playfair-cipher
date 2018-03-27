@@ -24,12 +24,15 @@ import java.util.Map;
 
 public class Playfair extends Crypto {
 
-	List<Position> positions = new LinkedList<Position>();
+	List<Position> positions;
 	String plainText;
+	String[][] cipherTable;
 
 	public Playfair() {
 		super();
+		this.positions = new LinkedList<Position>();
 		this.plainText = "";
+		this.cipherTable = new String[5][5];
 	}
 
 	
@@ -60,8 +63,8 @@ public class Playfair extends Crypto {
 		}
 		index = 0;
 		// now for some decryption
-
-		cipherCrack(cipherTable, cipherText, index); // Lower space complexity of the decryption
+		this.cipherTable = cipherTable;
+		cipherCrack(cipherTable, cipherText, index); 
 
 		return this.plainText;
 	}// decrypt
@@ -93,7 +96,7 @@ public class Playfair extends Crypto {
 			} else if (c1 == c2) {
 				r1 = (r1 + 4) % 5;
 				r2 = (r2 + 4) % 5;
-			} else{
+			} else {
 		        int temp = c1;
 		        c1 = c2;
 		        c2 = temp;
@@ -107,7 +110,8 @@ public class Playfair extends Crypto {
 
 	@Override
 	public String encrypt(String encryptionKey, String plainText) {
-		// TODO Auto-generated method stub
+		
+		
 		return null;
 	}
 

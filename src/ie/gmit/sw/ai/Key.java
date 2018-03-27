@@ -30,28 +30,22 @@ public class Key {
 	 * @return cipherKey
 	 */
 	public String generateKey() {
-
-		StringBuilder cipherKey = new StringBuilder();
-		this.cipherKey = this.cipherKey.toUpperCase().replaceAll("J", "").replaceAll("\\s+", "");
+		StringBuilder newCipherKey = new StringBuilder();
+		this.cipherKey = this.cipherKey.toUpperCase().replaceAll("J", "").replaceAll("\\W", "");
+		newCipherKey.append((this.cipherKey.length() < 25) ? new FileParser(null).removeRecurringChars(this.cipherKey + "ABCDEFGHIKLMNOPQRSTUVWXYZ") : this.cipherKey);
 		
-		cipherKey.append(this.cipherKey);
-		for (int i = 0; i < this.cipherKey.length(); i++) {
-			if (i != 0) {
-				if (this.cipherKey.charAt(i - 1) == this.cipherKey.charAt(i)) {
-					cipherKey.replace(i, i, "X");
-				} // inner if: there are recurring letters replace them with an X
-			} // outer if
-			for (int j = cipherKey.length() - 1; j > 0; j--) {
-				if (this.cipherKey.charAt(i) == cipherKey.charAt(j)) {
+		for (int i = 0; i < this.cipherKey.length(); i++) {	
+			for (int j = newCipherKey.length() - 1; j > 0; j--) {
+				if (this.cipherKey.charAt(i) == newCipherKey.charAt(j)) {
 					// remove non unique letters
 					if (i < j) {
-						cipherKey.deleteCharAt(j);
+						newCipherKey.deleteCharAt(j);
 					} // do not replace the first instance of the letter
 				} // IF
 			} // for each element in the cipherKey
 		} // for each element in the original key
-		System.out.println("key: " + cipherKey.toString());
-		return cipherKey.toString();
+		System.out.println("key: " + newCipherKey.toString());
+		return newCipherKey.toString();
 	}
 	
 	public String shuffleKey(String originalKey) {
@@ -103,16 +97,12 @@ public class Key {
 		return key;
 	}//flipCols
 	
-	private String swapRows(String key, int r1, int r2) {
-		Random r = new SecureRandom();
-		
-		return (r1 == r2) ? swapRows(key, r.nextInt(4), r.nextInt(4)) :  permutate(key, r1, r2, true);
+	private String swapRows(String key, int r1, int r2) {	
+		return (r1 == r2) ? swapRows(key, new SecureRandom().nextInt(4), new SecureRandom().nextInt(4)) :  permutate(key, r1, r2, true);
 	}//swapRows
 	
 	private String swapCols(String key, int c1, int c2) {
-		Random r = new SecureRandom();
-		
-		return (c1 == c2) ? swapCols(key, r.nextInt(4), r.nextInt(4)) : permutate(key, c1, c2, false);
+		return (c1 == c2) ? swapCols(key, new SecureRandom().nextInt(4), new SecureRandom().nextInt(4)) : permutate(key, c1, c2, false);
 	}//swapcols
 	
 	private String permutate(String key, int a, int b, boolean isRows) {
@@ -121,7 +111,7 @@ public class Key {
 			for(int i = 0; i < key.length() ; i++) {
 				int index = (isRows) ? i : i*5;
 				char tmp =  newKey[index + a];
-				newKey[index + a] =  newKey[index + a];
+				newKey[index + a] = newKey[index + b];
 				newKey[index + b] = tmp;
 			}//for
 			return new String(newKey);
