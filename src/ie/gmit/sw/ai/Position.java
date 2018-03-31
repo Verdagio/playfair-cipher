@@ -19,11 +19,11 @@ public class Position {
 		this.y = y;
 	}// constructor
 
-	public static Position getPosition(char target, String[][] cipherTable) {
+	public static Position getPosition(char target, char[][] cipherTable) {
 
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 5; j++) {
-				if (target == cipherTable[i][j].charAt(0)) {
+				if (target == cipherTable[i][j]) {
 					return new Position(i, j);
 				}
 			}

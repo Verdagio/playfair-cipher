@@ -11,10 +11,26 @@ public class Runner {
 		System.out.println("pre decryption: " + cipherText);
 		Playfair pf = new Playfair();
 		long startTime = System.currentTimeMillis();
-		System.out.println(pf.decrypt("the quick brown fox jumped over the lazy dogs", cipherText));
+		//System.out.println(pf.decrypt("the quick brown fox jumped over the lazy dogs", cipherText));
 		n.loadNGrams();
+		System.out.println("Running in:");
+		for(int i = 5 ; i >0; i--) {
+			Thread.sleep(1000);
+			System.out.println(i);
+		}
+	
+		SimulatedAnnealing sa = new SimulatedAnnealing(50, 10000, 32, null);
+		
+		try {
+			sa.annealing(cipherText);
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		long estimatedTime = System.currentTimeMillis() - startTime;
 		System.out.println(estimatedTime + "ms");
+		
 		
 	}
 

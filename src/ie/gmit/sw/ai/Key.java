@@ -44,7 +44,7 @@ public class Key {
 				} // IF
 			} // for each element in the cipherKey
 		} // for each element in the original key
-		System.out.println("key: " + newCipherKey.toString());
+		System.out.println("new key: " + newCipherKey.toString());
 		return newCipherKey.toString();
 	}
 	
@@ -54,21 +54,32 @@ public class Key {
 		int x = r.nextInt(99);
 		
 		if(x >= 0 && x < 2) {
-			modifiedKey = swapRows(originalKey, r.nextInt(4), r.nextInt(4));
+			//System.out.println("swap rows");
+			return swapRows(originalKey, r.nextInt(4), r.nextInt(4));
 		} else if ( x >= 2 && x < 4) {
-			modifiedKey = swapCols(originalKey, r.nextInt(4), r.nextInt(4));
+			//System.out.println("swap cols");
+			return swapCols(originalKey, r.nextInt(4), r.nextInt(4));
 		} else if ( x >= 4 && x < 6) {
-			modifiedKey = flipRows(originalKey);
+			//System.out.println("flip rows");
+			return flipRows(originalKey);
 		} else if ( x >= 6 && x < 8) {
-			modifiedKey = flipCols(originalKey);
+			////System.out.println("flip cols");
+			return flipCols(originalKey);
 		} else if ( x >= 8 && x < 10) {
-			modifiedKey = new StringBuffer(originalKey).reverse().toString();
+			//System.out.println("reverse");
+			return new StringBuffer(originalKey).reverse().toString();
 		} else {
-			List<String> strList = Arrays.asList(originalKey);
-			Collections.shuffle(strList);
-			modifiedKey = strList.toArray(new String[strList.size()]).toString();
+			//System.out.println("swap 2");
+			int a = r.nextInt(originalKey.length()-1);
+			int b = r.nextInt(originalKey.length()-1);
+			b = (a == b) ? (b == originalKey.length()-1) ? b - 1 : b + 1 : r.nextInt(originalKey.length()-1);
+			char[] res = originalKey.toCharArray();
+			char tmp = res[a];
+			//System.out.println("swapping: " + res[a] + " with: "+ res[b]);
+			res[a] = res[b];
+			res[b] = tmp;
+			return new String(res);
 		}// if else shuffle key
-		return modifiedKey;
 	}//shuffleKey
 	
 	private String flipRows(String key) {
@@ -76,7 +87,7 @@ public class Key {
 		StringBuilder sb = new StringBuilder();
 		
 		for(int i = 0; i < 5; i++) {
-			res[i] = key.substring(i*5, i*5 + 4);
+			res[i] = key.substring(i*5, i*5 + 5);
 			res[i] = new StringBuffer(res[i]).reverse().toString();
 			sb.append(res[i]);
 		}
@@ -84,17 +95,18 @@ public class Key {
 	}// flip rows
 	
 	private String flipCols(String key) {
+		char[] res = key.toCharArray();
 		int l = key.length() - (key.length()/5);
 		
-		for (int i = 0; i < 5; i++){
-			for(int j = 0; j < 5; j++) {
+		for(int i = 0; i < key.length() / 5; i++) {
+			for(int j = 0; j < key.length() / 5; j++) {
 				char tmp = key.charAt(i*5 + j);
-				key.replace(key.charAt(i*5 + j), key.charAt(l + j));
-				key.replace(key.charAt(l + j), tmp);
+				res[(i*5) + j] =  key.charAt(l + j);
+				res[l + j] =  tmp;
 			}
-			l-=5;
-		}//for
-		return key;
+			l -= 5;
+		}
+		return new String(res);
 	}//flipCols
 	
 	private String swapRows(String key, int r1, int r2) {	
@@ -107,12 +119,18 @@ public class Key {
 	
 	private String permutate(String key, int a, int b, boolean isRows) {
 			char[] newKey = key.toCharArray();
+			if(isRows) {
+				a *= 5;
+				b *= 5;
+			} 
 			
-			for(int i = 0; i < key.length() ; i++) {
+			for(int i = 0; i < key.length() / 5 ; i++) {
 				int index = (isRows) ? i : i*5;
-				char tmp =  newKey[index + a];
-				newKey[index + a] = newKey[index + b];
-				newKey[index + b] = tmp;
+				char tmp =  newKey[(index + a)];
+				newKey[(index + a)] = newKey[(index + b)];
+				newKey[(index + b)] = tmp;
+				
+				//System.out.println("is rows? "+isRows+" index: "+index+" "+a+ " " +b+ " "+newKey.length);
 			}//for
 			return new String(newKey);
 	}//permutate

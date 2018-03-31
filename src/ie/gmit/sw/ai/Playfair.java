@@ -24,15 +24,16 @@ import java.util.Map;
 
 public class Playfair extends Crypto {
 
-	List<Position> positions;
-	String plainText;
-	String[][] cipherTable;
+	private List<Position> positions;
+	private StringBuilder plainText;
+	private char[][] cipherTable;
+	private String cipherText;
 
 	public Playfair() {
 		super();
 		this.positions = new LinkedList<Position>();
-		this.plainText = "";
-		this.cipherTable = new String[5][5];
+		this.plainText = new StringBuilder();
+		this.cipherTable = new char[5][5];
 	}
 
 	
@@ -47,26 +48,24 @@ public class Playfair extends Crypto {
 	 * @throws Exception 
 	 */
 	public String decrypt(String key, String cipherText) throws Exception {
-		Key k = Key.keyInstance(key);
-		String decryptionKey = k.generateKey();
-		String[][] cipherTable = new String[5][5];
+		
+		String decryptionKey = key;
+		char[][] cipherTable = new char[5][5];
 
 		int index = 0;
 
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 5; j++) {
-				cipherTable[i][j] = Character.toString(decryptionKey.charAt(index));
-				System.out.print(cipherTable[i][j] + " ");
+				cipherTable[i][j] = decryptionKey.charAt(index);
+//				System.out.print(cipherTable[i][j] + " ");
 				index++;
 			}
-			System.out.println();
 		}
 		index = 0;
-		// now for some decryption
 		this.cipherTable = cipherTable;
 		cipherCrack(cipherTable, cipherText, index); 
 
-		return this.plainText;
+		return getPlainText();
 	}// decrypt
 
 	/**
@@ -78,11 +77,11 @@ public class Playfair extends Crypto {
 	 * @param index
 	 * @return this
 	 */
-	private int cipherCrack(String[][] table, String cipherText, int index) {
+	private int cipherCrack(char[][] table, String cipherText, int index) {
+		
+		StringBuilder sb = new StringBuilder();
 
-		if (!(index < cipherText.length() / 2)) {
-			return 0;
-		} else {
+		if(index <  cipherText.length() / 2) {
 			char a = cipherText.charAt(2 * index);
 			char b = cipherText.charAt(2 * index + 1);
 			int r1 = (int) Position.getPosition(a, table).getPosX();
@@ -100,12 +99,12 @@ public class Playfair extends Crypto {
 		        int temp = c1;
 		        c1 = c2;
 		        c2 = temp;
-		      }
-
-			plainText += table[r1][c1] + table[r2][c2];
-
+		    }
+			sb.append(table[r1][c1] +""+ table[r2][c2]);
+			setPlainText(sb.toString());
 			return cipherCrack(table, cipherText, 1 + index);
 		}// else if
+		return 0;
 	}// cipherCrack
 
 	@Override
@@ -113,6 +112,51 @@ public class Playfair extends Crypto {
 		
 		
 		return null;
+	}
+	public List<Position> getPositions() {
+		return positions;
+	}
+
+
+
+	public void setPositions(List<Position> positions) {
+		this.positions = positions;
+	}
+
+
+
+	public String getPlainText() {
+		return plainText.toString();
+	}
+
+
+
+	public void setPlainText(String plainText) {
+		this.plainText.append(plainText);
+	}
+
+
+
+	public char[][] getCipherTable() {
+		return cipherTable;
+	}
+
+
+
+	public void setCipherTable(char[][] cipherTable) {
+		this.cipherTable = cipherTable;
+	}
+
+
+
+	public String getCipherText() {
+		return cipherText;
+	}
+
+
+
+	public void setCipherText(String cipherText) {
+		this.cipherText = cipherText;
 	}
 
 }

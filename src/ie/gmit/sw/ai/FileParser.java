@@ -28,6 +28,10 @@ public class FileParser {
 		}
 	}
 	
+	public void cipherText() {
+		
+	}
+	
 	public String removeRecurringChars(String l) {
 		char[] newLine = l.toUpperCase().toCharArray();
 		StringBuilder sb = new StringBuilder();
