@@ -49,33 +49,25 @@ public class Key {
 	}
 	
 	public String shuffleKey(String originalKey) {
-		String modifiedKey = null;
 		Random r = new SecureRandom();
 		int x = r.nextInt(99);
 		
 		if(x >= 0 && x < 2) {
-			//System.out.println("swap rows");
 			return swapRows(originalKey, r.nextInt(4), r.nextInt(4));
 		} else if ( x >= 2 && x < 4) {
-			//System.out.println("swap cols");
 			return swapCols(originalKey, r.nextInt(4), r.nextInt(4));
 		} else if ( x >= 4 && x < 6) {
-			//System.out.println("flip rows");
 			return flipRows(originalKey);
 		} else if ( x >= 6 && x < 8) {
-			////System.out.println("flip cols");
 			return flipCols(originalKey);
 		} else if ( x >= 8 && x < 10) {
-			//System.out.println("reverse");
 			return new StringBuffer(originalKey).reverse().toString();
 		} else {
-			//System.out.println("swap 2");
 			int a = r.nextInt(originalKey.length()-1);
 			int b = r.nextInt(originalKey.length()-1);
 			b = (a == b) ? (b == originalKey.length()-1) ? b - 1 : b + 1 : r.nextInt(originalKey.length()-1);
 			char[] res = originalKey.toCharArray();
 			char tmp = res[a];
-			//System.out.println("swapping: " + res[a] + " with: "+ res[b]);
 			res[a] = res[b];
 			res[b] = tmp;
 			return new String(res);
@@ -128,9 +120,7 @@ public class Key {
 				int index = (isRows) ? i : i*5;
 				char tmp =  newKey[(index + a)];
 				newKey[(index + a)] = newKey[(index + b)];
-				newKey[(index + b)] = tmp;
-				
-				//System.out.println("is rows? "+isRows+" index: "+index+" "+a+ " " +b+ " "+newKey.length);
+				newKey[(index + b)] = tmp;				
 			}//for
 			return new String(newKey);
 	}//permutate

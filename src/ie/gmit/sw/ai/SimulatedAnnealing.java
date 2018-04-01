@@ -1,216 +1,87 @@
 package ie.gmit.sw.ai;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 public class SimulatedAnnealing {
 	
-	private LinkedList<String> shingles;
+	private SecureRandom r;
 	private Playfair pf;
 	private Grams g;
-	private String next;
-	
+ 	
 	private Key key;
-	private String parent;
-	private double parentScore;
-	private String child;
-	private double childScore;
-	private String bestKey;
-	private double bestScore;
 	
 	private int tempurature;
 	private int transitions;
-	private int step;
-	private double fitness;
 	
-	private HashMap<String, Integer> shingleMap; 
+	private HashMap<String, Integer> nGrams; 
 	
-	public SimulatedAnnealing(int tempurature, int transitions, int steps, String key) {
+	public SimulatedAnnealing(int tempurature, int transitions, String key, String cipherText) {
 		super();
+		r = new SecureRandom();
 		this.g = new Grams("4grams.txt");
 		this.pf = new Playfair();
+		this.pf.setCipherText(cipherText);
 		this.key = Key.keyInstance(key);
-		this.shingles = new LinkedList<String>();
 		this.tempurature = tempurature;
 		this.transitions = transitions;
-		this.step = steps;
-		this.fitness = 0;
-		this.parentScore = 0;
-		this.childScore = 0;
-		this.bestScore = 0;
+
 	}// construct
 	
-	public void generateShingles(String cipherText) {
-		for(int index = 0; index <= cipherText.length() - 4; index++) {
-			this.shingles.add(cipherText.substring(index, index + 4));
-			//return generateShingles(cipherText, index++);
-		}
-		//return 0;
+	public void annealing(String cipherText) throws Throwable {		
 		
-	}// recursive shingler 
-
-	public void annealing(String cipherText) throws Throwable {
-		double temp = 0;
+		nGrams =  (HashMap<String, Integer>) g.loadNGrams();	// load our quad grams 
+		String parent = key.generateKey();						// generate our key
+		String decryptedText = pf.decrypt(parent);				// decrypt text using said key
+		double parentScore = scoreText(decryptedText);			// score the decrypted text
+		double bestScore = parentScore;							// set the preliminary best score
 		
-		shingleMap =  (HashMap<String, Integer>) g.loadNGrams();
-		
-		parent = key.generateKey();
-		this.next = pf.decrypt(parent, cipherText);
-		generateShingles(cipherText);
-		
-		for(String shingle : shingles) {
-			if(shingleMap.keySet().contains(shingle)) {
-				temp += logProbability(shingleMap, shingle);
-			}//if
-		}//for
-		
-		System.out.println("4gram len: " + g.getCount());
-		this.fitness = temp;
-		System.out.println("Score: "+ this.fitness);
-		for(int i = tempurature; i > 0; i-= step) {
-			//transitions(cipherText, transitions);
-			for (int j = 0; j < transitions; j++) {
-				child = key.shuffleKey(parent);
-				double delta;
-				next = pf.decrypt(child, cipherText);
-				generateShingles(cipherText);
-				
-				for(String shingle : shingles) { 
-					if(shingleMap.keySet().contains(shingle)) {
-						childScore +=  logProbability(shingleMap, shingle); 
-					}// if
-				}//for
-				delta = childScore - fitness;	
+		for(int temp = tempurature; temp > 0; temp--) {
+			//transitions(cipherText, parent, parentScore, bestScore, 0);
+			for (int index = transitions; index > 0; index--) {
+				String child = key.shuffleKey(parent);			// set the child key
+				decryptedText = pf.decrypt(child);				// decrypt with the child key
+				double childScore = scoreText(decryptedText);	// score the childs version of the decrypted text	
+				double delta = childScore - parentScore;		// get the delta 	
+			
 				System.out.println(delta);
-
-				if(delta > 0) {
-					this.setParent(child);
-					this.setParentScore(childScore);
+				if(delta > 0) {									// if the delta is over 0 this key is better
+					parent = child;
+					parentScore = childScore;
 				} else {
-					if(Math.exp((delta/tempurature)) > 0.5) { 
-						this.setParent(child);
-						this.setParentScore(childScore);
+					if(Math.exp((delta/temp)) > r.nextDouble()) { // prevent getting stuck
+						parent = child;
+						parentScore = childScore;
 					}
 				}
+			
 				if(parentScore > bestScore) {
 					bestScore = parentScore;
-					bestKey = parent;
-					System.out.printf("\n%d best Score: %f0.3\tFor Key: %s\n", j, bestScore, bestKey);
-					if(bestKey.equalsIgnoreCase("THEQUICKBROWNFXMPDVRLAZYDGS")) {
-						Thread.sleep(5000);
-					}
-				}			}
+					String bestKey = parent;
+					System.out.printf("\n%d best Score: %f0.3\tFor Key: %s\n%s\n", index, bestScore, bestKey, decryptedText);
+				}//if p > b	
+			}//transitions
+			if(parentScore == bestScore) {
+				break;
+			}
 		}//tempurature
-		
 	}// annealing
 	
-	public double scoreText(String[] shingles, int index, double score) {
+	public double scoreText(String cipherText) {
+		double score = 0;
 		
-		if(index < shingles.length) {
-			if(shingleMap.keySet().contains(shingles[index])) {
-				score += logProbability(shingleMap, shingles[index]);
+		int range = (cipherText.length() > 400) ? 100 : cipherText.length();
+		
+		for(int i = 0; i < range; i++) {
+			String shingle = cipherText.substring(i, (i+4));
+			if(nGrams.containsKey(shingle)){
+				score = score + Math.log10(nGrams.get(shingle).doubleValue() / g.getCount());
+				
 			}
-			return scoreText(shingles, 1 + index, score);
-		}else return score;
-		
-	}
-	
-	public int transitions(String cipherText,  int index) throws Throwable {	
-		if(index > 0) {
-				child = key.shuffleKey(parent);
-				double delta;
-				this.next = pf.decrypt(child, cipherText);
-				generateShingles(cipherText);
-				
-				for(String shingle : this.shingles) { 
-					if(shingleMap.keySet().contains(shingle)) {
-						this.childScore += logProbability(shingleMap, shingle);  
-					}// if
-				}//for
-				
-				delta = this.childScore - this.fitness;	
-				if(delta >= 0) {
-					this.setParent(child);
-					this.setParentScore(childScore);
-				} else {
-					if(Math.exp((delta/tempurature)) > 0.5) {
-						this.setParent(child);
-						this.setParentScore(childScore);
-					}
-				}
-				if(parentScore > bestScore) {
-					setBestScore(parentScore);
-					setBestKey(parent);
-					System.out.printf("%d best Score: %f0.3\tFor Key: %s\n%s", index, getBestScore(), getBestKey(), pf.getPlainText());
-				}
-				return transitions(pf.getPlainText(), index--);
 		}
-			return 0;
-		
+		return score;
 	}
-	
-	public double logProbability(HashMap <String, Integer> map, String shingle) {
-		return  Math.log10(shingleMap.get(shingle).doubleValue()) /  Math.log10(g.getCount());
-	}
-
-	public String getParent() {
-		return parent;
-	}
-
-	public void setParent(String parent) {
-		this.parent = parent;
-	}
-
-	public double getParentScore() {
-		return parentScore;
-	}
-
-	public void setParentScore(double parentScore) {
-		this.parentScore = parentScore;
-	}
-
-	public String getChild() {
-		return child;
-	}
-
-	public void setChild(String child) {
-		this.child = child;
-	}
-
-	public double getChildScore() {
-		return childScore;
-	}
-
-	public void setChildScore(double childScore) {
-		this.childScore = childScore;
-	}
-
-	public String getBestKey() {
-		return bestKey;
-	}
-
-	public void setBestKey(String bestKey) {
-		this.bestKey = bestKey;
-	}
-
-	public double getBestScore() {
-		return bestScore;
-	}
-
-	public void setBestScore(double bestScore) {
-		this.bestScore = bestScore;
-	}
-
-	public double getFitness() {
-		return fitness;
-	}
-
-	public void setFitness(double fitness) {
-		this.fitness = fitness;
-	}
-	
-	
-	
 }
 
 

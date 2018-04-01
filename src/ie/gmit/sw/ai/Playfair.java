@@ -34,10 +34,9 @@ public class Playfair extends Crypto {
 		this.positions = new LinkedList<Position>();
 		this.plainText = new StringBuilder();
 		this.cipherTable = new char[5][5];
+		this.cipherText = "";
 	}
-
 	
-
 	/**
 	 * The decrypt method will take already encypted text (cipherText) and decypt it
 	 * out to plainText using the decryption key
@@ -47,7 +46,7 @@ public class Playfair extends Crypto {
 	 * @return plainText
 	 * @throws Exception 
 	 */
-	public String decrypt(String key, String cipherText) throws Exception {
+	public String decrypt(String key) throws Exception {
 		
 		String decryptionKey = key;
 		char[][] cipherTable = new char[5][5];
@@ -63,7 +62,7 @@ public class Playfair extends Crypto {
 		}
 		index = 0;
 		this.cipherTable = cipherTable;
-		cipherCrack(cipherTable, cipherText, index); 
+		cipherCrack(cipherTable, 0); 
 
 		return getPlainText();
 	}// decrypt
@@ -77,13 +76,13 @@ public class Playfair extends Crypto {
 	 * @param index
 	 * @return this
 	 */
-	private int cipherCrack(char[][] table, String cipherText, int index) {
+	private int cipherCrack(char[][] table, int index) {
 		
 		StringBuilder sb = new StringBuilder();
 
-		if(index <  cipherText.length() / 2) {
-			char a = cipherText.charAt(2 * index);
-			char b = cipherText.charAt(2 * index + 1);
+		if(index <  this.cipherText.length() / 2) {
+			char a = this.cipherText.charAt(2 * index);
+			char b = this.cipherText.charAt(2 * index + 1);
 			int r1 = (int) Position.getPosition(a, table).getPosX();
 			int c1 = (int) Position.getPosition(a, table).getPosY();
 			int r2 = (int) Position.getPosition(b, table).getPosX();
@@ -102,61 +101,44 @@ public class Playfair extends Crypto {
 		    }
 			sb.append(table[r1][c1] +""+ table[r2][c2]);
 			setPlainText(sb.toString());
-			return cipherCrack(table, cipherText, 1 + index);
+			return cipherCrack(table, 1 + index);
 		}// else if
 		return 0;
 	}// cipherCrack
 
 	@Override
 	public String encrypt(String encryptionKey, String plainText) {
-		
-		
 		return null;
 	}
 	public List<Position> getPositions() {
 		return positions;
 	}
 
-
-
 	public void setPositions(List<Position> positions) {
 		this.positions = positions;
 	}
-
-
 
 	public String getPlainText() {
 		return plainText.toString();
 	}
 
-
-
 	public void setPlainText(String plainText) {
 		this.plainText.append(plainText);
 	}
-
-
 
 	public char[][] getCipherTable() {
 		return cipherTable;
 	}
 
-
-
 	public void setCipherTable(char[][] cipherTable) {
 		this.cipherTable = cipherTable;
 	}
-
-
 
 	public String getCipherText() {
 		return cipherText;
 	}
 
-
-
 	public void setCipherText(String cipherText) {
 		this.cipherText = cipherText;
 	}
-
 }
