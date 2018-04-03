@@ -10,30 +10,49 @@ import java.util.Map;
 public class Grams {
 	
 	private String fileName;
-	private Map<String, Integer> nGrams;
-	private int count;
+	private Map<String, Double> nGrams;
+	private int no;
 	
 	public Grams(String fileName) {
 		this.fileName = fileName;
-		this.count = 0;
-		this.nGrams = new HashMap<String, Integer>();
+		this.nGrams = new HashMap<String, Double>();
 	}// Constructor
 
-	public Map<String, Integer> loadNGrams()  throws Exception {
+	public Map<String, Double> loadNGrams()  throws Exception {
+		int count = 0;
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fileName))));
 		String line = "";
 		System.out.println("Loading n-grams...");
 		while((line = br.readLine()) != null) {
-			nGrams.put(line.split(" ")[0], Integer.parseInt(line.split(" ")[1]));
+			nGrams.put(line.split(" ")[0], Double.parseDouble(line.split(" ")[1]));
 			count++;
 		}
+		setNo(count);
 		System.out.println("Sucessfully loaded n-grams...");
 		br.close();	
 		return this.nGrams;
 	}
 	
-	public int getCount() {
-		return this.count;
+	public double scoreText(String cipherText) {
+		double score = 0;
+		
+		int range = (cipherText.length() < 400) ?  cipherText.length() - 4 : 400 - 4;
+		
+		for(int i = 0; i < range; i++) {
+			Double frequency = (Double) nGrams.get(cipherText.substring(i, i+4));
+			if(frequency != null) {
+				score +=  (frequency / getNo());
+			}
+		}
+		return score;
+	}
+	
+	public void setNo(int no) {
+		this.no = no;
+	}
+	
+	public int getNo() {
+		return this.no;
 	}
 	
 }

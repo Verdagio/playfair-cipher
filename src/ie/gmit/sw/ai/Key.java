@@ -8,15 +8,13 @@ import java.util.Random;
 
 public class Key {
 	
-	private String cipherKey;
 	private static Key instance;
 	
-	private Key(String cipherKey) {
-		this.cipherKey = (cipherKey == null) ? "ABCDEFGHIKLMNOPQRSTUVWXYZ" : cipherKey;
+	private Key() {
 	}
 	
-	public static Key keyInstance(String cipherKey) {
-		return (instance == null) ? new Key(cipherKey) : instance;
+	public static Key keyInstance() {
+		return (instance == null) ? new Key() : instance;
 	}
 	
 	/**
@@ -31,12 +29,12 @@ public class Key {
 	 */
 	public String generateKey() {
 		StringBuilder newCipherKey = new StringBuilder();
-		this.cipherKey = this.cipherKey.toUpperCase().replaceAll("J", "").replaceAll("\\W", "");
-		newCipherKey.append((this.cipherKey.length() < 25) ? new FileParser(null).removeRecurringChars(this.cipherKey + "ABCDEFGHIKLMNOPQRSTUVWXYZ") : this.cipherKey);
+		String cipherKey = "ABCDEFGHIKLMNOPQRSTUVWXYZ";
+		newCipherKey.append((cipherKey.length() < 25) ? new FileParser(null).removeRecurringChars(cipherKey + "ABCDEFGHIKLMNOPQRSTUVWXYZ") : cipherKey);
 		
-		for (int i = 0; i < this.cipherKey.length(); i++) {	
+		for (int i = 0; i < cipherKey.length(); i++) {	
 			for (int j = newCipherKey.length() - 1; j > 0; j--) {
-				if (this.cipherKey.charAt(i) == newCipherKey.charAt(j)) {
+				if (cipherKey.charAt(i) == newCipherKey.charAt(j)) {
 					// remove non unique letters
 					if (i < j) {
 						newCipherKey.deleteCharAt(j);
@@ -49,8 +47,9 @@ public class Key {
 	}
 	
 	public String shuffleKey(String originalKey) {
+		//System.out.println(originalKey);
 		Random r = new SecureRandom();
-		int x = r.nextInt(99);
+		int x = r.nextInt(100);
 		
 		if(x >= 0 && x < 2) {
 			return swapRows(originalKey, r.nextInt(4), r.nextInt(4));
@@ -65,6 +64,7 @@ public class Key {
 		} else {
 			int a = r.nextInt(originalKey.length()-1);
 			int b = r.nextInt(originalKey.length()-1);
+			//System.out.printf("\nswapping chars %d with %d\n",a,b);
 			b = (a == b) ? (b == originalKey.length()-1) ? b - 1 : b + 1 : r.nextInt(originalKey.length()-1);
 			char[] res = originalKey.toCharArray();
 			char tmp = res[a];
@@ -75,6 +75,8 @@ public class Key {
 	}//shuffleKey
 	
 	private String flipRows(String key) {
+		//System.out.println("flipping all rows");
+
 		String[] res = new String[5];
 		StringBuilder sb = new StringBuilder();
 		
@@ -87,6 +89,7 @@ public class Key {
 	}// flip rows
 	
 	private String flipCols(String key) {
+		//System.out.println("flipping all columns");
 		char[] res = key.toCharArray();
 		int l = key.length() - (key.length()/5);
 		
@@ -102,10 +105,12 @@ public class Key {
 	}//flipCols
 	
 	private String swapRows(String key, int r1, int r2) {	
+		//System.out.printf("\nswapping rows %d with %d\n",r1,r2);
 		return (r1 == r2) ? swapRows(key, new SecureRandom().nextInt(4), new SecureRandom().nextInt(4)) :  permutate(key, r1, r2, true);
 	}//swapRows
 	
 	private String swapCols(String key, int c1, int c2) {
+		//System.out.printf("\nswapping cols %d with %d\n",c1,c2);
 		return (c1 == c2) ? swapCols(key, new SecureRandom().nextInt(4), new SecureRandom().nextInt(4)) : permutate(key, c1, c2, false);
 	}//swapcols
 	
@@ -115,7 +120,6 @@ public class Key {
 				a *= 5;
 				b *= 5;
 			} 
-			
 			for(int i = 0; i < key.length() / 5 ; i++) {
 				int index = (isRows) ? i : i*5;
 				char tmp =  newKey[(index + a)];

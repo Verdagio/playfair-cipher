@@ -60,11 +60,35 @@ public class Playfair extends Crypto {
 				index++;
 			}
 		}
-		index = 0;
+		//index = 0;
 		this.cipherTable = cipherTable;
-		cipherCrack(cipherTable, 0); 
+		
+		StringBuilder sb = new StringBuilder();
+		
+//		for(index = 0; index < this.cipherText.length() / 2; index ++) {
+//			char a = this.cipherText.charAt(2 * index);
+//			char b = this.cipherText.charAt(2 * index + 1);
+//			int r1 = (int) Position.getPosition(a, cipherTable).getPosX();
+//			int c1 = (int) Position.getPosition(a, cipherTable).getPosY();
+//			int r2 = (int) Position.getPosition(b, cipherTable).getPosX();
+//			int c2 = (int) Position.getPosition(b, cipherTable).getPosY();
+//
+//			if (r1 == r2) {
+//				c1 = (c1 + 4) % 5; 
+//				c2 = (c2 + 4) % 5;
+//			} else if (c1 == c2) {
+//				r1 = (r1 + 4) % 5;
+//				r2 = (r2 + 4) % 5;
+//			} else {
+//		        int temp = c1;
+//		        c1 = c2;
+//		        c2 = temp;
+//		    }
+//			sb.append(cipherTable[r1][c1] +""+ cipherTable[r2][c2]);
+//		}
+		
 
-		return getPlainText();
+		return cipherCrack(cipherTable, 0, sb);
 	}// decrypt
 
 	/**
@@ -76,11 +100,10 @@ public class Playfair extends Crypto {
 	 * @param index
 	 * @return this
 	 */
-	private int cipherCrack(char[][] table, int index) {
+	private String cipherCrack(char[][] table, int index, StringBuilder sb) {
+		//StringBuilder sb = new StringBuilder();
 		
-		StringBuilder sb = new StringBuilder();
-
-		if(index <  this.cipherText.length() / 2) {
+		if(index < this.cipherText.length() / 2) {
 			char a = this.cipherText.charAt(2 * index);
 			char b = this.cipherText.charAt(2 * index + 1);
 			int r1 = (int) Position.getPosition(a, table).getPosX();
@@ -100,10 +123,9 @@ public class Playfair extends Crypto {
 		        c2 = temp;
 		    }
 			sb.append(table[r1][c1] +""+ table[r2][c2]);
-			setPlainText(sb.toString());
-			return cipherCrack(table, 1 + index);
-		}// else if
-		return 0;
+			
+			return cipherCrack(table, 1 + index, sb);
+		}else return sb.toString();
 	}// cipherCrack
 
 	@Override
