@@ -1,35 +1,30 @@
 package ie.gmit.sw.ai;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Grams {
 	
 	private String fileName;
-	private Map<String, Double> nGrams;
-	private int no;
+	private Map<String, Integer> nGrams;
+	private long count;
 	
 	public Grams(String fileName) {
 		this.fileName = fileName;
-		this.nGrams = new HashMap<String, Double>();
+		this.nGrams = new HashMap<String, Integer>();
 	}// Constructor
-
-	public Map<String, Double> loadNGrams()  throws Exception {
-		int count = 0;
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fileName))));
-		String line = "";
-		System.out.println("Loading n-grams...");
-		while((line = br.readLine()) != null) {
-			nGrams.put(line.split(" ")[0], Double.parseDouble(line.split(" ")[1]));
-			count++;
-		}
-		setNo(count);
-		System.out.println("Sucessfully loaded n-grams...");
-		br.close();	
+	
+	//reference: https://stackoverflow.com/questions/30125296/how-to-sum-a-list-of-integers-with-java-streams
+	public Map<String, Integer> loadNGrams()  throws Exception {
+		Stream<String> stream = Files.lines(Paths.get(this.fileName));		
+		nGrams = stream.map(tmp -> tmp.split(" ")).collect(Collectors.toMap(tmp -> tmp[0], tmp -> Integer.parseInt(tmp[1])));
+		stream.close();
+		
+		count = nGrams.values().stream().mapToLong(i -> i).sum();
 		return this.nGrams;
 	}
 	
@@ -39,20 +34,20 @@ public class Grams {
 		int range = (cipherText.length() < 400) ?  cipherText.length() - 4 : 400 - 4;
 		
 		for(int i = 0; i < range; i++) {
-			Double frequency = (Double) nGrams.get(cipherText.substring(i, i+4));
-			if(frequency != null) {
-				score +=  (frequency / getNo());
+			Integer frequency = nGrams.get(cipherText.substring(i, i+4));
+ 			if(frequency != null) {
+				score +=  Math.log10((double) frequency / getCount());
 			}
 		}
 		return score;
 	}
 	
-	public void setNo(int no) {
-		this.no = no;
+	public void setCount(long count) {
+		this.count = count;
 	}
 	
-	public int getNo() {
-		return this.no;
+	public long getCount() {
+		return this.count;
 	}
 	
 }

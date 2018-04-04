@@ -1,10 +1,11 @@
 package ie.gmit.sw.ai;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class FileParser {
@@ -29,22 +30,23 @@ public class FileParser {
 		}
 	}
 	
-	public String readCipherText(String fileName) throws Throwable {
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fileName))));
-		StringBuilder sb = new StringBuilder();
-		String line;
-		
-		while((line = br.readLine()) != null) {
-			sb.append(line.toUpperCase());
+	public String readFile(String fileName) throws Throwable {
+		InputStream is = new FileInputStream(fileName);
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int length;
+		while ((length = is.read(buffer)) != -1) {
+		    result.write(buffer, 0, length);
 		}
-
-		return new String(sb.toString());
+		return result.toString();
 	}
 	
 	public void printDecryptedText(String decryptedText) throws Throwable {
 		FileOutputStream fos = new FileOutputStream("deciphered.txt");
 		byte[] bytes = decryptedText.getBytes();
-		fos.write(bytes);
+		for(byte b : bytes) {
+			fos.write(bytes);
+		}
 		fos.close();
 		
 	}

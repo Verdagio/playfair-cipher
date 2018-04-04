@@ -1,10 +1,4 @@
 package ie.gmit.sw.ai;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * The Playfair cipher is a manual symmetric encryption technique and was the
  * first literal digram substitution cipher. The technique encrypts pairs of
@@ -23,73 +17,38 @@ import java.util.Map;
  */
 
 public class Playfair extends Crypto {
-
-	private List<Position> positions;
-	private StringBuilder plainText;
-	private char[][] cipherTable;
+	
 	private String cipherText;
 
-	public Playfair() {
+	public Playfair(String cipherText) {
 		super();
-		this.positions = new LinkedList<Position>();
-		this.plainText = new StringBuilder();
-		this.cipherTable = new char[5][5];
-		this.cipherText = "";
+		this.cipherText = cipherText;
 	}
 	
 	/**
 	 * The decrypt method will take already encypted text (cipherText) and decypt it
 	 * out to plainText using the decryption key
 	 * 
-	 * @param key
-	 * @param cipherText
-	 * @return plainText
+	 * @param decryptionKey
+	 * @return cipherCrack()
 	 * @throws Exception 
 	 */
-	public String decrypt(String key) throws Exception {
-		
-		String decryptionKey = key;
-		char[][] cipherTable = new char[5][5];
-
-		int index = 0;
-
-		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < 5; j++) {
-				cipherTable[i][j] = decryptionKey.charAt(index);
-//				System.out.print(cipherTable[i][j] + " ");
-				index++;
-			}
-		}
-		//index = 0;
-		this.cipherTable = cipherTable;
-		
-		StringBuilder sb = new StringBuilder();
-		
-//		for(index = 0; index < this.cipherText.length() / 2; index ++) {
-//			char a = this.cipherText.charAt(2 * index);
-//			char b = this.cipherText.charAt(2 * index + 1);
-//			int r1 = (int) Position.getPosition(a, cipherTable).getPosX();
-//			int c1 = (int) Position.getPosition(a, cipherTable).getPosY();
-//			int r2 = (int) Position.getPosition(b, cipherTable).getPosX();
-//			int c2 = (int) Position.getPosition(b, cipherTable).getPosY();
-//
-//			if (r1 == r2) {
-//				c1 = (c1 + 4) % 5; 
-//				c2 = (c2 + 4) % 5;
-//			} else if (c1 == c2) {
-//				r1 = (r1 + 4) % 5;
-//				r2 = (r2 + 4) % 5;
-//			} else {
-//		        int temp = c1;
-//		        c1 = c2;
-//		        c2 = temp;
-//		    }
-//			sb.append(cipherTable[r1][c1] +""+ cipherTable[r2][c2]);
-//		}
-		
-
-		return cipherCrack(cipherTable, 0, sb);
+	public String decrypt(String decryptionKey) throws Exception {		
+		char[][] cipherTable = populateTable(decryptionKey);
+		return cipherCrack(cipherTable, 0, new StringBuilder(), true);
 	}// decrypt
+	
+	/**
+	 * The encrypt method will take plain text and encrypt it
+	 * out to cipher text using the encryption key
+	 * 
+	 * @param decryptionKey
+	 * @return cipherCrack()
+	 */
+	public String encrypt(String encryptionKey) {
+		char[][] cipherTable = populateTable(encryptionKey);
+		return cipherCrack(cipherTable, 0, new StringBuilder(), false);
+	}
 
 	/**
 	 * The cipher method will recursively scan through each letter getting its
@@ -98,10 +57,12 @@ public class Playfair extends Crypto {
 	 * @param table
 	 * @param cipherText
 	 * @param index
+	 * @param decrypt
 	 * @return this
 	 */
-	private String cipherCrack(char[][] table, int index, StringBuilder sb) {
-		//StringBuilder sb = new StringBuilder();
+	private String cipherCrack(char[][] table, int index, StringBuilder sb, boolean decrypt) {
+		
+		int modifier = (decrypt) ? 4 : 1;
 		
 		if(index < this.cipherText.length() / 2) {
 			char a = this.cipherText.charAt(2 * index);
@@ -112,11 +73,11 @@ public class Playfair extends Crypto {
 			int c2 = (int) Position.getPosition(b, table).getPosY();
 
 			if (r1 == r2) {
-				c1 = (c1 + 4) % 5; 
-				c2 = (c2 + 4) % 5;
+				c1 = (c1 + modifier) % 5; 
+				c2 = (c2 + modifier) % 5;
 			} else if (c1 == c2) {
-				r1 = (r1 + 4) % 5;
-				r2 = (r2 + 4) % 5;
+				r1 = (r1 + modifier) % 5;
+				r2 = (r2 + modifier) % 5;
 			} else {
 		        int temp = c1;
 		        c1 = c2;
@@ -124,38 +85,29 @@ public class Playfair extends Crypto {
 		    }
 			sb.append(table[r1][c1] +""+ table[r2][c2]);
 			
-			return cipherCrack(table, 1 + index, sb);
+			return cipherCrack(table, 1 + index, sb, decrypt);
 		}else return sb.toString();
 	}// cipherCrack
-
-	@Override
-	public String encrypt(String encryptionKey, String plainText) {
-		return null;
-	}
-	public List<Position> getPositions() {
-		return positions;
-	}
-
-	public void setPositions(List<Position> positions) {
-		this.positions = positions;
-	}
-
-	public String getPlainText() {
-		return plainText.toString();
-	}
-
-	public void setPlainText(String plainText) {
-		this.plainText.append(plainText);
-	}
-
-	public char[][] getCipherTable() {
+	
+	
+	/***
+	 * Takes in the decryption / encryption key and populates the cipher table 
+	 * using this
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public char[][] populateTable(String key){
+		char[][] cipherTable = new char[5][5];
+		int index = 0;
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
+				cipherTable[i][j] = key.charAt(index);
+				index++;
+			}
+		}
 		return cipherTable;
 	}
-
-	public void setCipherTable(char[][] cipherTable) {
-		this.cipherTable = cipherTable;
-	}
-
 	public String getCipherText() {
 		return cipherText;
 	}

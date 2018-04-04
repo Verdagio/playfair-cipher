@@ -13,6 +13,11 @@ package ie.gmit.sw.ai;
  */
 public abstract class Crypto implements Cryptography {
 	
-	public Crypto() {}
+	public Crypto() {
+		super();
+	}
+	
+	public abstract String decrypt(String decryptionKey) throws Exception;
+	public abstract String encrypt(String encryptionKey);
 	
 }

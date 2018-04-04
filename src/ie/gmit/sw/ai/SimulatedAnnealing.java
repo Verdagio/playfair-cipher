@@ -2,7 +2,7 @@ package ie.gmit.sw.ai;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Map;
 
 public class SimulatedAnnealing {
 	
@@ -13,35 +13,34 @@ public class SimulatedAnnealing {
 	private Key key;
 	
 	private int temperature;
-	private int transitions;
 	
-	private HashMap<String, Double> nGrams; 
+	private Map<String, Integer> nGrams; 
 	
-	public SimulatedAnnealing(int temperature, int transitions, String cipherText) {
+	public SimulatedAnnealing(int temperature, String cipherText) {
 		super();
-		r = new SecureRandom();
+		this.r = new SecureRandom();
 		this.g = new Grams("4grams.txt");
-		this.pf = new Playfair();
-		this.pf.setCipherText(cipherText);
+		this.pf = new Playfair(cipherText);
 		this.key = Key.keyInstance();
 		this.temperature = temperature;
-		this.transitions = transitions;
+		this.nGrams = new HashMap<String, Integer>(); 
 
 	}// construct
 	
 	public void annealing(String cipherText) throws Throwable {		
 		
-		nGrams =  (HashMap<String, Double>) g.loadNGrams();		// load our quad grams 
+		nGrams = g.loadNGrams();
 		String parent = key.generateKey();						// generate our key
+		System.out.println(parent);
 		String decryptedText = pf.decrypt(parent);				// decrypt text using said key
 		double parentScore = g.scoreText(decryptedText);		// score the decrypted text
 		double bestScore = parentScore;							// set the preliminary best score
-		System.out.println(bestScore);
+		System.out.println("Initial score: "+bestScore + " for key: "+ parent);
 		
-		for(int temp = temperature; temp > 0; temp --) {
-			for (int index = transitions; index > 0; index--) {
+		for(int temp = temperature; temp > 0; temp--) {
+			for (int index = 50000; index > 0; index--) {
 				String child = key.shuffleKey(parent);			//  Change the parent key slightly to get child key, 
-				decryptedText = pf.decrypt(child);		// decrypt with the child key
+				decryptedText = pf.decrypt(child);				// decrypt with the child key
 				double childScore = g.scoreText(decryptedText);	// Measure the fitness of the deciphered text using the child key	
 				double delta = childScore - parentScore;		// get the delta 	
 				if(delta > 0) {									// if the delta is over 0 this key is better
@@ -49,8 +48,8 @@ public class SimulatedAnnealing {
 					parentScore = childScore;
 
 				} else  {
-					double probability = Math.exp(-delta/temp);
-					if(probability > 0.5) { // prevent getting stuck
+					double probability = Math.exp(delta/temp);
+					if(probability > r.nextDouble()) { // prevent getting stuck
 						parent = child;
 						parentScore = childScore;
 					}
@@ -59,10 +58,17 @@ public class SimulatedAnnealing {
 				if(parentScore > bestScore) {
 					bestScore = parentScore;
 					String bestKey = parent;
-					System.out.printf("\nTransition: %d at Temp: %d\nBest Score: %f0.3\tFor Key: %s\nDecrypted message: %s\n", index, temp, bestScore, bestKey, decryptedText);
+					System.out.printf("\nTransition: %d at Temp: %d\nBest Score: %.2f\tFor Key: %s\nDecrypted message: %s\n", index, temp, bestScore, bestKey, decryptedText);
+					
 				}//if p > b	
 			}//transitions
 			System.out.println(temp);
+			
+			if(bestScore == parentScore && temp < temp/2) {
+				System.out.printf("\nTemp: %d\nBest Score: %.2f\tFor Key: %s\nDecrypted message: %s\n", temp, bestScore, parent, decryptedText);
+				new FileParser().printDecryptedText(decryptedText);
+				break;
+			}
 		}//tempurature
 	}// annealing
 	

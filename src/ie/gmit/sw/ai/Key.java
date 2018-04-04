@@ -28,26 +28,23 @@ public class Key {
 	 * @return cipherKey
 	 */
 	public String generateKey() {
-		StringBuilder newCipherKey = new StringBuilder();
 		String cipherKey = "ABCDEFGHIKLMNOPQRSTUVWXYZ";
-		newCipherKey.append((cipherKey.length() < 25) ? new FileParser(null).removeRecurringChars(cipherKey + "ABCDEFGHIKLMNOPQRSTUVWXYZ") : cipherKey);
+		char[] key = cipherKey.toCharArray();
 		
-		for (int i = 0; i < cipherKey.length(); i++) {	
-			for (int j = newCipherKey.length() - 1; j > 0; j--) {
-				if (cipherKey.charAt(i) == newCipherKey.charAt(j)) {
-					// remove non unique letters
-					if (i < j) {
-						newCipherKey.deleteCharAt(j);
-					} // do not replace the first instance of the letter
-				} // IF
-			} // for each element in the cipherKey
-		} // for each element in the original key
-		System.out.println("new key: " + newCipherKey.toString());
-		return newCipherKey.toString();
-	}
+		 int index;
+		 Random random = new SecureRandom();
+		 for (int i = key.length - 1; i > 0; i--) {
+			 index = random.nextInt(i + 1);
+			 if (index != i) {
+				 key[index] ^= key[i];
+				 key[i] ^= key[index];
+				 key[index] ^= key[i];
+			 } 
+		}	
+		return new String(key);
+	}// generate key
 	
 	public String shuffleKey(String originalKey) {
-		//System.out.println(originalKey);
 		Random r = new SecureRandom();
 		int x = r.nextInt(100);
 		
@@ -64,8 +61,8 @@ public class Key {
 		} else {
 			int a = r.nextInt(originalKey.length()-1);
 			int b = r.nextInt(originalKey.length()-1);
-			//System.out.printf("\nswapping chars %d with %d\n",a,b);
 			b = (a == b) ? (b == originalKey.length()-1) ? b - 1 : b + 1 : r.nextInt(originalKey.length()-1);
+			
 			char[] res = originalKey.toCharArray();
 			char tmp = res[a];
 			res[a] = res[b];
@@ -75,8 +72,6 @@ public class Key {
 	}//shuffleKey
 	
 	private String flipRows(String key) {
-		//System.out.println("flipping all rows");
-
 		String[] res = new String[5];
 		StringBuilder sb = new StringBuilder();
 		
@@ -89,7 +84,6 @@ public class Key {
 	}// flip rows
 	
 	private String flipCols(String key) {
-		//System.out.println("flipping all columns");
 		char[] res = key.toCharArray();
 		int l = key.length() - (key.length()/5);
 		
@@ -105,12 +99,10 @@ public class Key {
 	}//flipCols
 	
 	private String swapRows(String key, int r1, int r2) {	
-		//System.out.printf("\nswapping rows %d with %d\n",r1,r2);
 		return (r1 == r2) ? swapRows(key, new SecureRandom().nextInt(4), new SecureRandom().nextInt(4)) :  permutate(key, r1, r2, true);
 	}//swapRows
 	
 	private String swapCols(String key, int c1, int c2) {
-		//System.out.printf("\nswapping cols %d with %d\n",c1,c2);
 		return (c1 == c2) ? swapCols(key, new SecureRandom().nextInt(4), new SecureRandom().nextInt(4)) : permutate(key, c1, c2, false);
 	}//swapcols
 	
