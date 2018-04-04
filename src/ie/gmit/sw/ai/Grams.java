@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Grams {
@@ -28,16 +29,11 @@ public class Grams {
 		return this.nGrams;
 	}
 	
-	public double scoreText(String cipherText) {
+	public double scoreText(String text) {
 		double score = 0;
 		
-		int range = (cipherText.length() < 400) ?  cipherText.length() - 4 : 400 - 4;
-		
-		for(int i = 0; i < range; i++) {
-			Integer frequency = nGrams.get(cipherText.substring(i, i+4));
- 			if(frequency != null) {
-				score +=  Math.log10((double) frequency / getCount());
-			}
+		for(int i = 0; i < text.length() - 4; i++) {
+			score += Math.log10((double) (((nGrams.get(text.substring(i, i+4)) != null) ? nGrams.get(text.substring(i, i+4)) : 1))/ this.count);
 		}
 		return score;
 	}

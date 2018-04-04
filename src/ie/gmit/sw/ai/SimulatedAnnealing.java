@@ -9,10 +9,11 @@ public class SimulatedAnnealing {
 	private SecureRandom r;
 	private Playfair pf;
 	private Grams g;
- 	
 	private Key key;
-	
 	private int temperature;
+	
+	private String bestKey;
+	private String bestTxt;
 	
 	private Map<String, Integer> nGrams; 
 	
@@ -43,12 +44,12 @@ public class SimulatedAnnealing {
 				decryptedText = pf.decrypt(child);				// decrypt with the child key
 				double childScore = g.scoreText(decryptedText);	// Measure the fitness of the deciphered text using the child key	
 				double delta = childScore - parentScore;		// get the delta 	
+				//System.out.println(delta);
 				if(delta > 0) {									// if the delta is over 0 this key is better
 					parent = child;
 					parentScore = childScore;
-
-				} else  {
-					if(Math.exp(delta/temp) > r.nextDouble()) { // prevent getting stuck
+				} else  {					
+					if((Math.pow(Math.E, (delta/temp))) > r.nextDouble()) { // prevent getting stuck
 						parent = child;
 						parentScore = childScore;
 					}
@@ -56,19 +57,22 @@ public class SimulatedAnnealing {
 			
 				if(parentScore > bestScore) {
 					bestScore = parentScore;
-					String bestKey = parent;
-					System.out.printf("\nTransition: %d at Temp: %d\nBest Score: %.2f\tFor Key: %s\nDecrypted message: %s\n", index, temp, bestScore, bestKey, decryptedText);
+					this.bestKey = parent;
+					this.bestTxt = decryptedText;
+					System.out.printf("\nTransition: %d at Temp: %d\nBest Score: %.2f\tFor Key: %s\nDecrypted message: %s\n", index, temp, bestScore, bestKey, bestTxt);
 					
 				}//if p > b	
 			}//transitions
 			System.out.println(temp);
 			
-			if(bestScore == parentScore && temp < temp/2) {
-				System.out.printf("\nTemp: %d\nBest Score: %.2f\tFor Key: %s\nDecrypted message: %s\n", temp, bestScore, parent, decryptedText);
+			if(bestScore >= parentScore && bestScore > -3300) {
+				System.out.printf("\nTemp: %d\nBest Score: %.2f\tFor Key: %s\nDecrypted message: %s\n", temp, bestScore, bestKey, bestTxt);
 				new FileHandler().writeFile(decryptedText);
 				break;
 			}
 		}//tempurature
+		System.out.printf("\nBest Score: %.2f\tFor Key: %s\nDecrypted message: %s\n", bestScore, parent, decryptedText);
+		new FileHandler().writeFile(decryptedText);
 	}// annealing
 	
 
