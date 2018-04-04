@@ -48,8 +48,7 @@ public class SimulatedAnnealing {
 					parentScore = childScore;
 
 				} else  {
-					double probability = Math.exp(delta/temp);
-					if(probability > r.nextDouble()) { // prevent getting stuck
+					if(Math.exp(delta/temp) > r.nextDouble()) { // prevent getting stuck
 						parent = child;
 						parentScore = childScore;
 					}
@@ -66,7 +65,7 @@ public class SimulatedAnnealing {
 			
 			if(bestScore == parentScore && temp < temp/2) {
 				System.out.printf("\nTemp: %d\nBest Score: %.2f\tFor Key: %s\nDecrypted message: %s\n", temp, bestScore, parent, decryptedText);
-				new FileParser().printDecryptedText(decryptedText);
+				new FileHandler().writeFile(decryptedText);
 				break;
 			}
 		}//tempurature

@@ -8,26 +8,24 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class FileParser {
+public class FileHandler {
 	
 	private String fileName;
 	
-	public FileParser() {}
+	public FileHandler() {}
 	
-	public FileParser(String fileName) {
+	public FileHandler(String fileName) {
 		this.fileName = fileName;
 	}
 	
-	public void primeText() throws Throwable {
+	public String primeText(String str) throws Throwable {
 		
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(this.fileName))));
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(this.fileName)));
 		String line;
-		String regex ="(^\\W)(\\s+)(J)";
 		while((line = br.readLine()) != null) {
 			line = line.toUpperCase().replaceAll("\\W", "").replace("J", "");
-			line = removeRecurringChars(line);
-			System.out.println(line);
 		}
+		return br.toString();
 	}
 	
 	public String readFile(String fileName) throws Throwable {
@@ -41,9 +39,9 @@ public class FileParser {
 		return result.toString();
 	}
 	
-	public void printDecryptedText(String decryptedText) throws Throwable {
+	public void writeFile(String text) throws Throwable {
 		FileOutputStream fos = new FileOutputStream("deciphered.txt");
-		byte[] bytes = decryptedText.getBytes();
+		byte[] bytes = text.getBytes();
 		for(byte b : bytes) {
 			fos.write(bytes);
 		}
@@ -51,8 +49,8 @@ public class FileParser {
 		
 	}
 	
-	public String removeRecurringChars(String l) {
-		char[] newLine = l.toUpperCase().toCharArray();
+	public String removeRecurringChars(String str) {
+		char[] newLine = str.toCharArray();
 		StringBuilder sb = new StringBuilder();
 		
 		for(int i = 0; i < newLine.length; i++) {
