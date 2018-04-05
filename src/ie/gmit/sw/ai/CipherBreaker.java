@@ -5,10 +5,8 @@ import java.util.Scanner;
 public class CipherBreaker {
 
 	public static void main(String[] args) throws Exception, Throwable {
-		//Grams n = new Grams("4grams.txt");
-		Scanner input = new Scanner(System.in);
-		
-		System.out.println("Playfair Cipher Cracker");
+		Scanner input = new Scanner(System.in);	
+		System.out.println("Playfair Cipher Decryptor / encryptor");
 		int choice = 0;
 		boolean exit = false;
 		String fileName = "";
@@ -22,9 +20,8 @@ public class CipherBreaker {
 			case 1:
 				System.out.println("Please enter your filename including extension (eg: hello.txt): ");
 				fileName = input.next();
-				String cipherText = new FileHandler().readFile(fileName);
-				System.out.println("pre decryption: " + cipherText);
-				
+				String cipherText = new FileHandler().readFile(fileName);	
+				System.out.println(cipherText.length());
 				System.out.println("This may take a moment...");
 				for(int i = 3 ; i >0; i--) {
 					Thread.sleep(1000);
@@ -32,21 +29,29 @@ public class CipherBreaker {
 				}
 					long startTime = System.currentTimeMillis();
 					SimulatedAnnealing sa = new SimulatedAnnealing(20, cipherText);
-					sa.annealing(cipherText);
+					sa.simulatedAnnealing();
 					long estimatedTime = System.currentTimeMillis() - startTime;
 					System.out.println("Executed in: " + estimatedTime / 1000 + " Seconds");
-				
-				
-	
-				
+					System.out.println("enter file name including extension(eg. myfile.txt): ");	
+					fileName = "";
+					fileName = input.next();
+					new FileHandler().writeFile("Executed in: " + estimatedTime / 1000 + " Seconds\n" +  sa.getStatistics(), fileName);
 				break;
 			case 2: 
 				System.out.println("Please enter your filename including extension (eg: hello.txt): ");
 				fileName = input.next();
 				String plainText = new FileHandler().readFile(fileName);
-				System.out.println("Please type in a fairly long sentence to be used as a key: ");
-				String key = input.next();
-				
+				System.out.println("Generating a random key...");
+				String key = Key.keyInstance().generateKey();
+				Playfair pf = new Playfair(plainText);
+				System.out.println("enter file name including extension(eg. myfile.txt): ");	
+				fileName = "";
+				fileName = input.next();
+				long start = System.currentTimeMillis();
+				new FileHandler().writeFile(pf.encrypt(key), fileName);
+				long end = System.currentTimeMillis() - start;
+				System.out.println("Done");
+				System.out.println("Encrypted using the key: " + key + "  - In : "  + end + " ms");
 				break;
 			case 3:
 				exit = true;
@@ -54,6 +59,7 @@ public class CipherBreaker {
 			}// switch
 		}while(!exit);
 		
+		System.out.println("Bye bye...");
 	}
 
 }

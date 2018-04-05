@@ -11,6 +11,8 @@ local.properties
 .recommenders
 .project
 .classpath
+*.txt
+*.ucls
 
 # External tool builders
 .externalToolBuilders/
