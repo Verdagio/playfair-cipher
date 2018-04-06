@@ -14,6 +14,7 @@ local.properties
 .classpath
 *.txt
 *.ucls
+*.jar
 
 # External tool builders
 .externalToolBuilders/
