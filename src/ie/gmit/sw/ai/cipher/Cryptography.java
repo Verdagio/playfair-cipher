@@ -1,4 +1,4 @@
-package ie.gmit.sw.ai;
+package ie.gmit.sw.ai.cipher;
 
 public interface Cryptography {
 	public String decrypt(String decryptionKey) throws Exception, Throwable;

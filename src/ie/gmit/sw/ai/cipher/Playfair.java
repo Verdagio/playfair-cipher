@@ -1,4 +1,4 @@
-package ie.gmit.sw.ai;
+package ie.gmit.sw.ai.cipher;
 /**
  * The Playfair cipher is a manual symmetric encryption technique and was the
  * first literal digram substitution cipher. The technique encrypts pairs of
@@ -31,7 +31,7 @@ public class Playfair extends Crypto {
 	 * 
 	 * @param decryptionKey
 	 * @return cipherCrack()
-	 * @throws Exception 
+	 * @throws Exception IOException
 	 */
 	public String decrypt(String decryptionKey) throws Exception {		
 		char[][] cipherTable = populateTable(decryptionKey);
@@ -42,7 +42,7 @@ public class Playfair extends Crypto {
 	 * The encrypt method will take plain text and encrypt it
 	 * out to cipher text using the encryption key
 	 * 
-	 * @param decryptionKey
+	 * @param String decryptionKey
 	 * @return cipherCrack()
 	 */
 	public String encrypt(String encryptionKey) {
@@ -51,20 +51,23 @@ public class Playfair extends Crypto {
 	}
 
 	/**
-	 * The cipher method will recursively scan through each letter getting its
-	 * position in the 2d array and use this to crack the cipher text
-	 * 	 *
+	 * The cipher method will recursively scan through each pair of letters getting its
+	 * position in the 2d array and use this to crack the cipher text until complete
+	 * 
+	 * We can RE-USE this function for both deciphering and ciphering the test by adding
+	 * a simple flag which will dynamically set the modifier for our character swapping.
+	 * 
 	 * @param table
 	 * @param cipherText
 	 * @param index
 	 * @param decrypt
-	 * @return this
+	 * @return this / string
 	 */
 	private String cipherCrack(char[][] table, int index, StringBuilder sb, boolean decrypt) {
 		
 		int modifier = (decrypt) ? 4 : 1;
 		
-		if(index < this.cipherText.length() / 2) {
+		if(index < (this.cipherText.length() / 2) - 1 ) {
 			char a = this.cipherText.charAt(2 * index);
 			char b = this.cipherText.charAt(2 * index + 1);
 			int r1 = (int) Position.getPosition(a, table).getPosX();
@@ -92,10 +95,10 @@ public class Playfair extends Crypto {
 	
 	/***
 	 * Takes in the decryption / encryption key and populates the cipher table 
-	 * using this
+	 * using the gicen key
 	 * 
-	 * @param key
-	 * @return
+	 * @param String key
+	 * @return 2d char array
 	 */
 	public char[][] populateTable(String key){
 		char[][] cipherTable = new char[5][5];

@@ -1,18 +1,16 @@
-package ie.gmit.sw.ai;
+package ie.gmit.sw.ai.cipher;
 
 /**
- * The Position object will direct a character to an x & y position within a 2
+ * The Position object will direct a character to an x and y position within a 2
  * dimensional table
  * 
- * @author Daniel Verdejo - G00282931
+ * @author Daniel Verdejo G00282931
  *
  */
 public class Position {
 
 	private int x;
 	private int y;
-
-	public Position () {}
 	
 	private Position(int x, int y) {
 		this.x = x;
