@@ -30,6 +30,7 @@ public class CipherBreaker {
 					Thread.sleep(1000);
 					System.out.println(i);
 				}
+				System.out.println("Timer started!");
 				long startTime = System.currentTimeMillis();
 				SimulatedAnnealing sa = new SimulatedAnnealing(20, cipherText);
 				sa.simulatedAnnealing();

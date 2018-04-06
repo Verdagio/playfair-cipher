@@ -98,7 +98,7 @@ public class SimulatedAnnealing {
 				} // if p > b
 			} // transitions
 			System.out.println("temp: " + temp);
-			if (bestScore > (initScore / 1.6)) {
+			if (bestScore > (initScore / 1.55)) {
 				break;
 			} // escape the loop
 		} // temperature
