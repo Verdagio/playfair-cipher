@@ -21,10 +21,7 @@ right answer.
 Simulated annealing (SA) is an excellent approach for breaking a cipher using a randomly
 generated key. Unlike conventional Hill Climbing algorithms, that are easily side-tracked by
 local optima, SA uses randomization to avoid heuristic plateaux and attempt to find a global
-maxima solution. The following pseudocode shows how simulated annealing can be used break
-a Playfair Cipher. Note that the initial value of the variables temp and transitions can have a
-major impact on the success of the SA algorithm. Both variables control the cooling schedule
-of SA and should be experimented with for best results 
+maxima solution.
 
 ## How the playfair cypher works
 
